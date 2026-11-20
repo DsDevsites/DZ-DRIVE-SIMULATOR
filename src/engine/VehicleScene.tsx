@@ -6,7 +6,7 @@ import * as THREE from 'three';
 export type CameraMode = 'orbit' | 'chase' | 'cockpit';
 type Props = {
  color:string; turbo:boolean; intercooler:boolean; driving:boolean; throttle:number; steer:number; brake:boolean;
- speed:number; tyres:boolean; suspension:boolean; brakes:boolean; exhaust:boolean; cameraMode:CameraMode;
+ speed:number; tyres:boolean; suspension:boolean; brakes:boolean; exhaust:boolean; cameraMode:CameraMode; hoodOpen:boolean;
 };
 
 function Wheel({x,z,front,tyres,brakes,steer,speed}:{x:number;z:number;front:boolean;tyres:boolean;brakes:boolean;steer:number;speed:number}) {
@@ -22,7 +22,7 @@ function Wheel({x,z,front,tyres,brakes,steer,speed}:{x:number;z:number;front:boo
  </group>;
 }
 
-function Car({color,turbo,intercooler,driving,throttle,steer,brake,speed,tyres,suspension,brakes,exhaust,cameraMode}:Props) {
+function Car({color,turbo,intercooler,driving,throttle,steer,brake,speed,tyres,suspension,brakes,exhaust,cameraMode,hoodOpen}:Props) {
  const root=useRef<THREE.Group>(null);
  const bodyY=suspension?.62:.69;
  useFrame((_,dt)=>{if(!root.current)return;root.current.rotation.z=THREE.MathUtils.damp(root.current.rotation.z,-steer*(speed/150)*.075,dt,5);root.current.rotation.y=THREE.MathUtils.damp(root.current.rotation.y,-steer*(speed/200)*.12,dt,4);root.current.position.x=THREE.MathUtils.damp(root.current.position.x,THREE.MathUtils.clamp(root.current.position.x+steer*speed/3.6*dt*.34,-4.35,4.35),dt,7);});
@@ -33,7 +33,23 @@ function Car({color,turbo,intercooler,driving,throttle,steer,brake,speed,tyres,s
  return <group ref={root}>
   <group position={[0,bodyY-.69,0]}>
    <RoundedBox args={[2.02,.48,4.18]} radius={.13} smoothness={4} position={[0,.69,0]} castShadow receiveShadow><primitive object={paint} attach="material"/></RoundedBox>
-   <RoundedBox args={[1.88,.31,1.12]} radius={.09} smoothness={3} position={[0,.88,1.48]} castShadow><primitive object={paint} attach="material"/></RoundedBox>
+   <group position={[0,1.02,1.92]} rotation={[hoodOpen?-.92:0,0,0]}>
+    <RoundedBox args={[1.88,.16,1.08]} radius={.07} smoothness={3} position={[0,-.04,-.46]} castShadow><primitive object={paint} attach="material"/></RoundedBox>
+   </group>
+   {hoodOpen&&<group position={[0,.62,1.1]}>
+    <RoundedBox args={[1.28,.34,1.05]} radius={.08} smoothness={3} position={[0,.25,.12]} castShadow><meshStandardMaterial color="#252e38" metalness={.65} roughness={.42}/></RoundedBox>
+    <mesh position={[0,.48,.12]}><boxGeometry args={[.8,.1,.65]}/><meshStandardMaterial color="#111820" metalness={.35} roughness={.5}/></mesh>
+    <mesh position={[0,.54,.12]}><boxGeometry args={[.42,.13,.5]}/><meshStandardMaterial color="#1769a8" metalness={.75} roughness={.25}/></mesh>
+    <mesh position={[0,.62,.12]}><cylinderGeometry args={[.12,.15,.25,20]}/><meshStandardMaterial color="#8795a3" metalness={.88} roughness={.22}/></mesh>
+    <mesh position={[.48,.34,.05]} rotation={[0,0,Math.PI/2]}><cylinderGeometry args={[.1,.1,.72,20]}/><meshStandardMaterial color="#c07835" metalness={.85}/></mesh>
+    <mesh position={[.48,.34,.05]}><torusGeometry args={[.105,.025,8,20]}/><meshStandardMaterial color="#e6a34d" metalness={.85}/></mesh>
+    <mesh position={[-.48,.37,.18]} rotation={[0,0,Math.PI/2]}><cylinderGeometry args={[.09,.09,.55,16]}/><meshStandardMaterial color="#202a34" metalness={.65}/></mesh>
+    <mesh position={[0,.34,-.38]}><boxGeometry args={[1.05,.38,.08]}/><meshStandardMaterial color="#7b8c9c" metalness={.8} roughness={.3}/></mesh>
+    {Array.from({length:13},(_,i)=><mesh key={i} position={[-.48+i*.08,.34,-.33]}><boxGeometry args={[.025,.3,.025]}/><meshStandardMaterial color="#c0cbd5" metalness={.9}/></mesh>)}
+    <mesh position={[-.66,.2,.12]}><boxGeometry args={[.2,.36,.32]}/><meshStandardMaterial color="#151c24" metalness={.35}/></mesh>
+    <mesh position={[.68,.2,-.18]}><boxGeometry args={[.18,.28,.3]}/><meshStandardMaterial color="#111820" metalness={.3}/></mesh>
+    <mesh position={[0,.12,.52]}><boxGeometry args={[1.45,.05,.04]}/><meshStandardMaterial color="#aeb9c5" metalness={.85}/></mesh>
+   </group>}
    <RoundedBox args={[1.86,.3,1.04]} radius={.08} smoothness={3} position={[0,.87,-1.5]} castShadow><primitive object={paint} attach="material"/></RoundedBox>
    <RoundedBox args={[1.66,.78,2.08]} radius={.2} smoothness={5} position={[0,1.16,-.23]} castShadow><primitive object={paint} attach="material"/></RoundedBox>
    <RoundedBox args={[1.51,.56,1.82]} radius={.12} smoothness={4} position={[0,1.2,-.2]}><primitive object={glass} attach="material"/></RoundedBox>
