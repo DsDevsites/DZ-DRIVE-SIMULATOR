@@ -1,0 +1,10 @@
+{
+  "name": "DZ Drive Simulator",
+  "short_name": "DZ Drive",
+  "start_url": "/",
+  "display": "fullscreen",
+  "orientation": "landscape",
+  "background_color": "#05080d",
+  "theme_color": "#05080d",
+  "description": "Simulador automotivo 3D DZ Drive"
+}
