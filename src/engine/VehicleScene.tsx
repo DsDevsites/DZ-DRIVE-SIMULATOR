@@ -22,12 +22,12 @@ function Wheel({x,z,front,tyres,brakes,steer,speed}:{x:number;z:number;front:boo
  </group>;
 }
 
-function Car({color,turbo,intercooler,driving,throttle,steer,brake,speed,tyres,suspension,brakes,exhaust}:Props) {
+function Car({color,turbo,intercooler,driving,throttle,steer,brake,speed,tyres,suspension,brakes,exhaust,cameraMode}:Props) {
  const root=useRef<THREE.Group>(null);
  const bodyY=suspension?.62:.69;
  useFrame((_,dt)=>{if(!root.current)return;root.current.rotation.z=THREE.MathUtils.damp(root.current.rotation.z,-steer*(speed/150)*.075,dt,5);root.current.rotation.y=THREE.MathUtils.damp(root.current.rotation.y,-steer*(speed/200)*.12,dt,4);root.current.position.x=THREE.MathUtils.damp(root.current.position.x,THREE.MathUtils.clamp(root.current.position.x+steer*speed/3.6*dt*.34,-4.35,4.35),dt,7);});
  const paint=useMemo(()=>new THREE.MeshStandardMaterial({color,metalness:.72,roughness:.24}),[color]);
- const glass=new THREE.MeshPhysicalMaterial({color:'#101b28',metalness:.35,roughness:.12,clearcoat:1,clearcoatRoughness:.08});
+ const glass=new THREE.MeshPhysicalMaterial({color:'#101b28',metalness:.25,roughness:.12,clearcoat:1,clearcoatRoughness:.08,transparent:true,opacity:.48,depthWrite:false});
  const dark=new THREE.MeshStandardMaterial({color:'#111820',metalness:.45,roughness:.42});
  const chrome=new THREE.MeshStandardMaterial({color:'#aeb9c5',metalness:.92,roughness:.18});
  return <group ref={root}>
@@ -65,6 +65,7 @@ function Car({color,turbo,intercooler,driving,throttle,steer,brake,speed,tyres,s
    {[-1,1].map(x=><mesh key={x} position={[x*.7,1.65,-1.05]}><boxGeometry args={[.32,.09,.35]}/><primitive object={paint} attach="material"/></mesh>)}
    {[-1,1].map(x=><mesh key={x} position={[x*.7,1.68,-1.05]}><boxGeometry args={[.035,.12,.38]}/><primitive object={dark} attach="material"/></mesh>)}
    {[-1,1].map(x=><mesh key={x} position={[x*.82,.46,0]}><boxGeometry args={[.18,.13,2.3]}/><primitive object={dark} attach="material"/></mesh>)}
+   {cameraMode==='cockpit'&&<group><RoundedBox args={[1.35,.16,.42]} radius={.07} position={[0,1.02,.62]}><primitive object={dark} attach="material"/></RoundedBox><mesh position={[0,1.2,.52]}><torusGeometry args={[.2,.025,10,28]}/><primitive object={dark} attach="material"/></mesh></group>}
   </group>
   {[-1,1].flatMap(x=>[-1.36,1.36].map(z=><Wheel key={x+'-'+z} x={x*1.01} z={z} front={z>0} tyres={tyres} brakes={brakes} steer={steer} speed={speed}/>))}
   {suspension&&[-1,1].map(x=><mesh key={x} position={[x*.85,.31,0]}><boxGeometry args={[.06,.2,2.1]}/><meshStandardMaterial color="#2f83ff" metalness={.65}/></mesh>)}
@@ -98,6 +99,6 @@ export default function VehicleScene(props:Props) {
   {!props.driving&&<><mesh position={[-5,2,-4]}><boxGeometry args={[.16,4,8]}/><meshStandardMaterial color="#202b38" metalness={.55}/></mesh><mesh position={[5,2,-4]}><boxGeometry args={[.16,4,8]}/><meshStandardMaterial color="#202b38" metalness={.55}/></mesh></>}
   <ContactShadows position={[0,-.01,0]} opacity={.5} scale={10} blur={2.5} far={4}/>
   <Environment preset="city"/>
-  {props.cameraMode==='orbit'&&!props.driving?<OrbitControls enablePan={false} minDistance={4.2} maxDistance={10.5} minPolarAngle={.3} maxPolarAngle={1.42} target={[0,.75,0]}/>:<PerspectiveCamera makeDefault position={camPosition as [number,number,number]} fov={props.cameraMode==='cockpit'?78:42} />}
+  {props.cameraMode==='orbit'&&!props.driving?<OrbitControls enablePan={false} minDistance={4.2} maxDistance={10.5} minPolarAngle={.3} maxPolarAngle={1.42} target={[0,.75,0]}/>:<PerspectiveCamera makeDefault position={camPosition as [number,number,number]} rotation={props.cameraMode==='cockpit'?[0,Math.PI,0]:[0,0,0]} fov={props.cameraMode==='cockpit'?78:42} />}
  </Canvas>;
 }
